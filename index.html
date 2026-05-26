@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KHOA CÔNG NGHỆ THÔNG TIN - ĐẠI HỌC ĐẠI NAM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-cyber: #040712;
+            --panel-bg: rgba(8, 14, 32, 0.85);
+            --neon-cyan: #00f3ff;
+            --neon-red: #ff2a5f;
+            --neon-green: #39ff14;
+            --text-main: #c4d1ec;
+            --border-glow: rgba(0, 243, 255, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-cyber);
+            color: var(--text-main);
+            font-family: 'Share Tech Mono', monospace;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Scanline Background Effect */
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            z-index: 999;
+            background-size: 100% 4px;
+            pointer-events: none;
+        }
+
+        .grid-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(rgba(0, 243, 255, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 243, 255, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -1;
+        }
+
+        /* NAVIGATION BAR */
+        nav {
+            background: rgba(4, 7, 18, 0.95);
+            border-bottom: 2px solid var(--border-glow);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem; /* Tăng khoảng cách với logo to */
+        }
+
+        /* TO HƠN: Tăng kích thước hiển thị logo thương hiệu */
+        .dnu-logo {
+            height: 85px; 
+            width: auto;
+            filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.4));
+            transition: transform 0.3s ease;
+        }
+        .dnu-logo:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-brand-text .main-lbl {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: 1.5px;
+        }
+
+        .nav-brand-text .sub-lbl {
+            font-size: 0.85rem;
+            color: var(--neon-cyan);
+            letter-spacing: 1px;
+            margin-top: 0.2rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            list-style: none;
+        }
+
+        @media (max-width: 992px) {
+            .nav-links { display: none; }
+        }
+
+        .nav-links a {
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 8px var(--neon-cyan);
+        }
+
+        /* MAIN CONTAINER */
+        .wrapper {
+            max-width: 1400px;
+            margin: 2.5rem auto;
+            padding: 0 1.5rem;
+        }
+
+        /* HEADER SECTION */
+        header {
+            margin-bottom: 3rem;
+            border-left: 4px solid var(--neon-cyan);
+            padding-left: 1.5rem;
+        }
+
+        .sys-status {
+            font-size: 0.85rem;
+            color: var(--neon-green);
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .sys-status::before {
+            content: ''; display: inline-block; width: 6px; height: 6px; background: var(--neon-green); border-radius: 50%; box-shadow: 0 0 8px var(--neon-green);
+        }
+
+        header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.4rem;
+            font-weight: 900;
+            color: #fff;
+            text-transform: uppercase;
+        }
+
+        header h1 span { color: var(--neon-cyan); }
+
+        /* PORTAL GRID LAYOUT */
+        .portal-grid {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        @media (max-width: 1100px) {
+            .portal-grid { grid-template-columns: 1fr; }
+        }
+
+        .main-stream {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* CYBER CARD STYLE */
+        .cyber-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-glow);
+            padding: 2rem;
+            position: relative;
+            clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+            box-shadow: inset 0 0 15px rgba(0,243,255,0.03);
+        }
+
+        .card-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-transform: uppercase;
+            border-bottom: 1px dashed rgba(255,255,255,0.08);
+            padding-bottom: 0.75rem;
+        }
+        .title-c1 i { color: var(--neon-cyan); }
+        .title-c2 i { color: #b14eff; }
+
+        /* SECTOR INTERFACES */
+        .sector-01-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .sector-01-layout { grid-template-columns: 1fr; }
+        }
+
+        .radar-sight {
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            aspect-ratio: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.3);
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .radar-sight::before {
+            content: ''; position: absolute; top: -2px; left: -2px; width: 8px; height: 8px; border-top: 2px solid var(--neon-cyan); border-left: 2px solid var(--neon-cyan);
+        }
+        .radar-sight::after {
+            content: ''; position: absolute; bottom: -2px; right: -2px; width: 8px; height: 8px; border-bottom: 2px solid var(--neon-cyan); border-right: 2px solid var(--neon-cyan);
+        }
+
+        .branch-nodes {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .node-row {
+            background: rgba(255,255,255,0.01);
+            border: 1px solid rgba(255,255,255,0.03);
+            padding: 0.9rem 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sub-sectors {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 640px) {
+            .sub-sectors { grid-template-columns: 1fr; }
+        }
+
+        .mini-module {
+            background: rgba(255,255,255,0.01);
+            border-left: 4px solid #b14eff;
+            padding: 1rem 1.25rem;
+        }
+        .border-red { border-left-color: var(--neon-red); }
+
+        .mini-module h4 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.95rem;
+            color: #fff;
+            margin-bottom: 0.75rem;
+        }
+
+        .chip-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .chip-node {
+            background: rgba(255,255,255,0.03);
+            padding: 0.6rem 0.8rem;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* EVENTS BLOCK */
+        .news-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .news-item {
+            display: flex;
+            gap: 1rem;
+            background: rgba(255,255,255,0.02);
+            padding: 1rem;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .news-date {
+            background: rgba(255, 42, 95, 0.1);
+            color: var(--neon-red);
+            padding: 0.5rem;
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-align: center;
+            min-width: 65px;
+        }
+
+        /* SIDEBAR COMPONENTS */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .spec-container {
+            background: rgba(6, 12, 26, 0.6);
+            border: 1px solid rgba(255,255,255,0.04);
+            padding: 1.25rem;
+        }
+
+        .spec-header {
+            font-size: 0.85rem;
+            color: #5f7597;
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 0.4rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .grid-data-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        .grid-data-row span:last-child { color: #fff; font-weight: bold; }
+
+        .metric-block {
+            text-align: center;
+            background: linear-gradient(180deg, rgba(0, 243, 255, 0.05) 0%, transparent 100%);
+            padding: 1.25rem;
+            border: 1px solid rgba(0, 243, 255, 0.1);
+        }
+        .metric-num {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            color: var(--neon-cyan);
+            font-weight: 900;
+        }
+
+        .register-form input {
+            width: 100%;
+            background: #090e1a;
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 0.6rem;
+            color: #fff;
+            font-family: inherit;
+            margin-bottom: 0.75rem;
+            outline: none;
+        }
+
+        .action-btn {
+            display: block;
+            background: var(--neon-cyan);
+            color: #000;
+            text-align: center;
+            padding: 0.9rem;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            text-decoration: none;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+            border: none;
+            cursor: pointer;
+        }
+
+        /* CHỖ LIÊN HỆ: Thiết kế cấu trúc tag mới (SECTION riêng biệt, độc lập toàn diện) */
+        .comms-hub-tag {
+            background: linear-gradient(135deg, rgba(6, 12, 26, 0.95) 0%, rgba(13, 25, 52, 0.95) 100%);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            box-shadow: 0 0 25px rgba(0, 243, 255, 0.1);
+            padding: 2rem;
+            margin-top: 4rem;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Cắt vát 2 góc đối xứng tạo điểm nhấn cơ khí */
+        .comms-hub-tag {
+            clip-path: polygon(30px 0, 100% 0, 100% calc(100% - 30px), calc(100% - 30px) 100%, 0 100%, 0 30px);
+        }
+
+        @media (max-width: 768px) {
+            .comms-hub-tag { grid-template-columns: 1fr; text-align: center; }
+        }
+
+        .comms-info h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            color: #fff;
+            margin-bottom: 1rem;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        @media (max-width: 768px) { .comms-info h3 { justify-content: center; } }
+
+        .comms-info h3 i { color: var(--neon-cyan); }
+
+        .comms-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .comms-line {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1rem;
+        }
+        @media (max-width: 768px) { .comms-line { justify-content: center; } }
+
+        .comms-line i { width: 20px; color: var(--neon-cyan); text-align: center;}
+
+        .comms-action-panel {
+            display: flex;
+            justify-content: flex-end;
+        }
+        @media (max-width: 768px) { .comms-action-panel { justify-content: center; } }
+
+        .hotline-cyber-btn {
+            background: var(--neon-red);
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            text-transform: uppercase;
+            text-decoration: none;
+            padding: 1.2rem 2rem;
+            letter-spacing: 1.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: 0 0 20px rgba(255, 42, 95, 0.4);
+            clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+            transition: all 0.3s;
+        }
+
+        .hotline-cyber-btn:hover {
+            background: #fff;
+            color: #000;
+            box-shadow: 0 0 30px #fff;
+        }
+
+        /* SYSTEM FOOTER */
+        footer {
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding: 2rem;
+            background: #02040a;
+            margin-top: 2rem;
+        }
+
+        .footer-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            font-size: 0.85rem;
+            color: #5f7597;
+        }
+
+        .footer-brand-name {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="grid-bg"></div>
+
+    <nav>
+        <div class="nav-brand">
+            <img class="dnu-logo" src="https://inkythuatso.com/uploads/thumbnails/800/2021/12/logo-dai-hoc-dai-nam-inkythuatso-converted-01-23-09-54-10.jpg" alt="DNU Logo">
+            <div class="nav-brand-text">
+                <div class="main-lbl">KHOA CNTT</div>
+                <div class="sub-lbl">TRƯỜNG ĐẠI HỌC ĐẠI NAM</div>
+            </div>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#" class="active">Trang chủ</a></li>
+            <li><a href="#">Tuyển sinh</a></li>
+            <li><a href="#">Chương trình đào tạo</a></li>
+            <li><a href="#">Nghiên cứu</a></li>
+            <li><a href="#">Liên hệ</a></li>
+        </ul>
+    </nav>
+
+    <div class="wrapper">
+        
+        <header>
+            <div class="sys-status">CORE SYSTEM ONLINE // PORTAL HỆ THỐNG ĐÀO TẠO</div>
+            <h1>KHÁM PHÁ CÁC CHUYÊN NGÀNH KHỐI CÔNG NGHỆ <span>2026</span></h1>
+            <h2>Hệ thống thông tin tích hợp dữ liệu giảng dạy thực hành trực quan</h2>
+        </header>
+
+        <div class="portal-grid">
+            
+            <div class="main-stream">
+                
+                <div class="cyber-card">
+                    <div class="card-title title-c1">
+                        <i class="fa-solid fa-network-wired"></i> 01 // CƠ CẤU ĐÀO TẠO CỐT LÕI
+                    </div>
+                    
+                    <div class="sector-01-layout">
+                        <div class="radar-sight">
+                            <i class="fa-solid fa-circle-nodes" style="font-size: 2.2rem; color: var(--neon-cyan); margin-bottom: 0.5rem;"></i>
+                            <span style="font-size: 0.8rem; color: #5f7597;">STUDENT ID TRACKING</span>
+                            <span style="color: #fff; font-size: 0.9rem; font-weight: bold;">[ẢNH THÀNH VIÊN]</span>
+                        </div>
+
+                        <div class="branch-nodes">
+                            <div class="node-row"><span>[MODULE_A] Công nghệ thông tin</span> <i class="fa-solid fa-code"></i></div>
+                            <div class="sub-sectors">
+                                <div class="mini-module border-red">
+                                    <h4>Hệ thống nhúng</h4>
+                                    <div class="chip-list">
+                                        <div class="chip-node"><i class="fa-solid fa-microchip"></i> Vi điều khiển & IOT</div>
+                                    </div>
+                                </div>
+                                <div class="mini-module border-red">
+                                    <h4>Phát triển phần mềm</h4>
+                                    <div class="chip-list">
+                                        <div class="chip-node"><i class="fa-solid fa-terminal"></i> C++ / Web Dev</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="node-row" style="margin-top: 0.5rem;"><span>[MODULE_B] Robot và Trí tuệ nhân tạo</span> <i class="fa-solid fa-robot"></i></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cyber-card">
+                    <div class="card-title title-c2">
+                        <i class="fa-solid fa-brain"></i> 02 // CÁC PHÂN KHU ĐÀO TẠO ĐỘT PHÁ
+                    </div>
+                    <div class="sub-sectors">
+                        <div class="mini-module">
+                            <h4>02. HỆ THỐNG THÔNG TIN</h4>
+                            <div class="chip-list">
+                                <div class="chip-node"><i class="fa-solid fa-cloud"></i> Điện toán đám mây</div>
+                                <div class="chip-node"><i class="fa-solid fa-mobile-screen"></i> Phát triển ứng dụng</div>
+                            </div>
+                        </div>
+                        <div class="mini-module">
+                            <h4>03. KHOA HỌC MÁY TÍNH</h4>
+                            <div class="chip-list">
+                                <div class="chip-node"><i class="fa-solid fa-database"></i> Khoa học dữ liệu</div>
+                                <div class="chip-node"><i class="fa-solid fa-eye"></i> Trí tuệ nhân tạo (AI)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cyber-card">
+                    <div class="card-title title-c1" style="color: var(--neon-red);">
+                        <i class="fa-solid fa-bullhorn"></i> 03 // BẢNG TIN & SỰ KIỆN CÔNG NGHỆ NỔI BẬT
+                    </div>
+                    <div class="news-timeline">
+                        <div class="news-item">
+                            <div class="news-date">MAY 2026</div>
+                            <div class="news-content">
+                                <h5>Khai mạc ngày hội công nghệ và việc làm Khoa CNTT DNU</h5>
+                                <p>Cơ hội kết nối thực tập và tuyển dụng trực tiếp cùng hơn 50 doanh nghiệp đối tác công nghệ hàng đầu.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="sidebar">
+                <div class="spec-container">
+                    <div class="spec-header">DỮ LIỆU THỰC THI (METRICS)</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="metric-block">
+                            <div class="metric-num">95%</div>
+                            <div style="font-size: 0.75rem; margin-top: 0.25rem;">Có việc làm ngay</div>
+                        </div>
+                        <div class="metric-block" style="border-color: var(--neon-red);">
+                            <div class="metric-num" style="color: var(--neon-red);">30+</div>
+                            <div style="font-size: 0.75rem; margin-top: 0.25rem;">Đối tác chiến lược</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="spec-container">
+                    <div class="spec-header">TIÊU CHÍ ĐÀO TẠO</div>
+                    <div class="grid-data-row"><span>Chương trình:</span><span>Cốt lõi toàn diện</span></div>
+                    <div class="grid-data-row"><span>Cơ sở vật chất:</span><span>Lab hiện đại</span></div>
+                    <div class="grid-data-row"><span>Môi trường:</span><span>Chuẩn quốc tế</span></div>
+                </div>
+
+                <div class="spec-container">
+                    <div class="spec-header">ĐĂNG KÝ TƯ VẤN XETS TUYỂN</div>
+                    <form class="register-form" onsubmit="event.preventDefault(); alert('Hệ thống đã ghi nhận!');">
+                        <input type="text" placeholder="Họ và tên thí sinh" required>
+                        <input type="tel" placeholder="Số điện thoại liên hệ" required>
+                        <button type="submit" class="action-btn" style="width: 100%;">Gửi yêu cầu xét tuyển</button>
+                    </form>
+                </div>
+            </div>
+
+        </div> <section class="comms-hub-tag">
+            <div class="comms-info">
+                <h3><i class="fa-solid fa-satellite-dish"></i> COMMUNICATIONS HUB // ĐƯỜNG DÂY LIÊN HỆ</h3>
+                <div class="comms-details">
+                    <div class="comms-line">
+                        <i class="fa-solid fa-building-flag"></i>
+                        <span>Văn phòng Khoa: Tòa nhà Trung tâm, Trường Đại học Đại Nam</span>
+                    </div>
+                    <div class="comms-line">
+                        <i class="fa-solid fa-envelope-open-text"></i>
+                        <span>Email tiếp nhận thông tin: phongkhoacntt@dainam.edu.vn</span>
+                    </div>
+                </div>
+            </div>
+            <div class="comms-action-panel">
+                <a href="tel:0981295226" class="hotline-cyber-btn">
+                    <i class="fa-solid fa-headset"></i> HOTLINE: 0523832999
+                </a>
+            </div>
+        </section>
+
+    </div> <footer>
+        <div class="footer-inner">
+            <div class="footer-brand-name">KHOA CNTT // ĐẠI HỌC ĐẠI NAM</div>
+            <div>Mã định danh cổng thông tin: DNU-IT-PORTAL-2026</div>
+            <div style="color: var(--neon-cyan);">KHƠI DẬY TIỀM NĂNG — VƯƠN TỚI THÀNH CÔNG</div>
+        </div>
+    </footer>
+
+</body>
+</html>
